@@ -1,83 +1,71 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, message, Card } from 'antd';
+import { Form, Input, Button, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { blogApi } from '../services/api';
 import { BlogCreateRequest } from '../types';
-import { useNavigate } from 'react-router-dom';
 
-interface ArticleFormProps {
+interface Props {
   initialValues?: BlogCreateRequest;
-  onSubmit?: (data: BlogCreateRequest) => void;
+  onSubmit?: (data: BlogCreateRequest) => Promise<void>;
   buttonText?: string;
 }
 
-const ArticleForm: React.FC<ArticleFormProps> = ({
+const ArticleForm: React.FC<Props> = ({
   initialValues = { title: '', content: '' },
   onSubmit,
-  buttonText = 'Create Article'
+  buttonText = 'Create Article',
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (values: BlogCreateRequest) => {
+  const handleFinish = async (values: BlogCreateRequest) => {
+    setLoading(true);
     try {
-      setLoading(true);
       if (onSubmit) {
         await onSubmit(values);
       } else {
         await blogApi.createBlog(values);
-        message.success('Article created successfully!');
+        message.success('Article created!');
         navigate('/blogs');
       }
-    } catch (error) {
-      message.error('Failed to create article. Please try again.');
-      console.error('Error creating article:', error);
+    } catch {
+      message.error('Failed to save article');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card title={buttonText} style={{ margin: '0 auto' }}>
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={initialValues}
-        onFinish={handleSubmit}
+    <Form form={form} layout="vertical" initialValues={initialValues} onFinish={handleFinish}>
+      <Form.Item
+        name="title"
+        label="Title"
+        rules={[
+          { required: true, message: 'Please enter a title' },
+          { min: 3, max: 100, message: 'Title must be 3–100 characters' },
+        ]}
       >
-        <Form.Item
-          name="title"
-          label="Title"
-          rules={[
-            { required: true, message: 'Please input article title!' },
-            { min: 3, message: 'Title must be at least 3 characters' },
-            { max: 100, message: 'Title must not exceed 100 characters' }
-          ]}
-        >
-          <Input placeholder="Enter article title" />
-        </Form.Item>
+        <Input placeholder="Article title" size="large" />
+      </Form.Item>
 
-        <Form.Item
-          name="content"
-          label="Content"
-          rules={[
-            { required: true, message: 'Please input article content!' },
-            { min: 10, message: 'Content must be at least 10 characters' }
-          ]}
-        >
-          <Input.TextArea 
-            placeholder="Enter article content" 
-            rows={10} 
-          />
-        </Form.Item>
+      <Form.Item
+        name="content"
+        label="Content"
+        rules={[
+          { required: true, message: 'Please enter content' },
+          { min: 10, message: 'Content must be at least 10 characters' },
+        ]}
+      >
+        <Input.TextArea placeholder="Write your article..." rows={16} />
+      </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            {buttonText}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+      <Form.Item>
+        <Button type="primary" htmlType="submit" loading={loading} size="large">
+          {buttonText}
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

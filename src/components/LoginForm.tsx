@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, message, Card } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { Form, Input, Button, message } from 'antd';
+import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import { LoginRequest } from '../types';
@@ -8,65 +9,36 @@ import { LoginRequest } from '../types';
 const LoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const handleSubmit = async (values: LoginRequest) => {
     setLoading(true);
     try {
-      const response = await api.post('/auth/login', values);
-      const token = response.data.access_token;
-      login(token);
+      const res = await api.post('/auth/login', values);
+      login(res.data.access_token);
       message.success('Login successful');
-      // Redirect to home page after successful login
-      window.location.href = '/';
+      navigate('/blogs');
     } catch (error: any) {
-      if (error.response?.status === 401) {
-        message.error('Invalid email or password');
-      } else if (error.response?.status === 500) {
-        message.error('Server error, please try again later');
-      } else {
-        message.error('Login failed, please try again');
-      }
+      message.error(error.response?.status === 401 ? 'Invalid email or password' : 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card title="Login" style={{ maxWidth: 400, margin: '0 auto' }}>
-      <Form
-        form={form}
-        onFinish={handleSubmit}
-        layout="vertical"
-      >
-        <Form.Item
-          name="email"
-          label="Email"
-          rules={[
-            { required: true, message: 'Please input your email' },
-            { type: 'email', message: 'Please input a valid email' },
-          ]}
-        >
-          <Input prefix={<UserOutlined />} placeholder="Email" />
-        </Form.Item>
-
-        <Form.Item
-          name="password"
-          label="Password"
-          rules={[
-            { required: true, message: 'Please input your password' },
-          ]}
-        >
-          <Input.Password prefix={<LockOutlined />} placeholder="Password" />
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+    <Form layout="vertical" onFinish={handleSubmit} size="large">
+      <Form.Item name="email" rules={[{ required: true, message: 'Please enter your email' }, { type: 'email' }]}>
+        <Input prefix={<MailOutlined />} placeholder="Email" />
+      </Form.Item>
+      <Form.Item name="password" rules={[{ required: true, message: 'Please enter your password' }]}>
+        <Input.Password prefix={<LockOutlined />} placeholder="Password" />
+      </Form.Item>
+      <Form.Item style={{ marginBottom: 0 }}>
+        <Button type="primary" htmlType="submit" loading={loading} block>
+          Login
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

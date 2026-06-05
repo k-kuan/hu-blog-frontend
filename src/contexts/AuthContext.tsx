@@ -22,52 +22,50 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
+function decodeToken(token: string): { user: UserInfo; expired: boolean } | null {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const expired = payload.exp ? payload.exp * 1000 < Date.now() : false;
+    return {
+      user: {
+        id: payload.id,
+        username: payload.username,
+        email: payload.email,
+      },
+      expired,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if token exists in localStorage on component mount
     const token = localStorage.getItem('access_token');
     if (token) {
-      // Decode token to get user info
-      try {
-        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-        setUser({
-          id: tokenPayload.id,
-          username: tokenPayload.username,
-          email: tokenPayload.email
-        });
+      const decoded = decodeToken(token);
+      if (decoded && !decoded.expired) {
+        setUser(decoded.user);
         setIsAuthenticated(true);
-      } catch (error) {
-        // Invalid token, clear it
+      } else {
         localStorage.removeItem('access_token');
-        setUser(null);
-        setIsAuthenticated(false);
       }
     }
   }, []);
 
   const login = (token: string) => {
-    // Store token in localStorage
     localStorage.setItem('access_token', token);
-    
-    // Decode token to get user info
-    try {
-      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-      setUser({
-        id: tokenPayload.id,
-        username: tokenPayload.username,
-        email: tokenPayload.email
-      });
+    const decoded = decodeToken(token);
+    if (decoded && !decoded.expired) {
+      setUser(decoded.user);
       setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Error decoding token:', error);
     }
   };
 
   const logout = () => {
-    // Remove token from localStorage
     localStorage.removeItem('access_token');
     setUser(null);
     setIsAuthenticated(false);

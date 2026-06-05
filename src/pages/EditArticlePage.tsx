@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { message, Spin, Layout, Typography } from 'antd';
+import { Typography, Spin, message } from 'antd';
 import ArticleForm from '../components/ArticleForm';
 import { blogApi } from '../services/api';
 import { Blog, BlogCreateRequest } from '../types';
-
-const { Title } = Typography;
-const { Content } = Layout;
 
 const EditArticlePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,69 +12,56 @@ const EditArticlePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    (async () => {
       if (!id) return;
-      
       try {
         setLoading(true);
-        const data = await blogApi.getBlog(Number(id));
-        setArticle(data);
-      } catch (error) {
-        message.error('Failed to load article. Please try again.');
-        console.error('Error loading article:', error);
+        setArticle(await blogApi.getBlog(Number(id)));
+      } catch {
+        message.error('Failed to load article');
         navigate('/blogs');
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchArticle();
+    })();
   }, [id, navigate]);
 
   const handleUpdate = async (values: BlogCreateRequest) => {
     if (!id) return;
-    
     try {
       await blogApi.updateBlog(Number(id), values);
-      message.success('Article updated successfully!');
+      message.success('Article updated!');
       navigate(`/blogs/${id}`);
-    } catch (error) {
-      message.error('Failed to update article. Please try again.');
-      console.error('Error updating article:', error);
+    } catch {
+      message.error('Failed to update article');
     }
   };
 
   if (loading) {
     return (
-      <Layout style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Content style={{ maxWidth: 1200, width: '100%', padding: '24px' }}>
-          <Spin size="large" />
-        </Content>
-      </Layout>
+      <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center', padding: '80px 0' }}>
+        <Spin size="large" />
+      </div>
     );
   }
 
   if (!article) {
     return (
-      <Layout style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Content style={{ maxWidth: 1200, width: '100%', padding: '24px' }}>
-          <Title level={2}>Article not found</Title>
-        </Content>
-      </Layout>
+      <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <Typography.Title level={2}>Article not found</Typography.Title>
+      </div>
     );
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Content style={{ maxWidth: 1200, width: '100%', padding: '24px' }}>
-        <Title level={2}>Edit Article</Title>
-        <ArticleForm
-          initialValues={{ title: article.title, content: article.content }}
-          onSubmit={handleUpdate}
-          buttonText="Update Article"
-        />
-      </Content>
-    </Layout>
+    <div style={{ maxWidth: 720, margin: '0 auto' }}>
+      <Typography.Title level={2}>Edit Article</Typography.Title>
+      <ArticleForm
+        initialValues={{ title: article.title, content: article.content }}
+        onSubmit={handleUpdate}
+        buttonText="Update Article"
+      />
+    </div>
   );
 };
 

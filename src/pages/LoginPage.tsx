@@ -1,20 +1,16 @@
 import React from 'react';
+import { Typography, Card } from 'antd';
 import LoginForm from '../components/LoginForm';
-import { Typography, Layout } from 'antd';
 
-const { Title } = Typography;
-const { Content } = Layout;
-
-const LoginPage: React.FC = () => {
-  return (
-    <Layout style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Content style={{ maxWidth: 500, width: '100%', padding: '24px', textAlign: 'center' }}>
-        <Title level={2}>Welcome to Hu Blog</Title>
-        <Title level={4}>Please login to continue</Title>
-        <LoginForm />
-      </Content>
-    </Layout>
-  );
-};
+const LoginPage: React.FC = () => (
+  <div style={{ maxWidth: 400, margin: '40px auto' }}>
+    <Typography.Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>
+      Login
+    </Typography.Title>
+    <Card>
+      <LoginForm />
+    </Card>
+  </div>
+);
 
 export default LoginPage;

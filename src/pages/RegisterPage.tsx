@@ -1,20 +1,16 @@
 import React from 'react';
+import { Typography, Card } from 'antd';
 import RegisterForm from '../components/RegisterForm';
-import { Typography, Layout } from 'antd';
 
-const { Title } = Typography;
-const { Content } = Layout;
-
-const RegisterPage: React.FC = () => {
-  return (
-    <Layout style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Content style={{ maxWidth: 500, width: '100%', padding: '24px', textAlign: 'center' }}>
-        <Title level={2}>Welcome to Hu Blog</Title>
-        <Title level={4}>Please register to continue</Title>
-        <RegisterForm />
-      </Content>
-    </Layout>
-  );
-};
+const RegisterPage: React.FC = () => (
+  <div style={{ maxWidth: 400, margin: '40px auto' }}>
+    <Typography.Title level={3} style={{ textAlign: 'center', marginBottom: 24 }}>
+      Register
+    </Typography.Title>
+    <Card>
+      <RegisterForm />
+    </Card>
+  </div>
+);
 
 export default RegisterPage;
