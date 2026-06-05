@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, Avatar, Dropdown, Space } from 'antd';
-import { UserOutlined, LogoutOutlined, EditOutlined, HomeOutlined, CodeOutlined } from '@ant-design/icons';
+import { UserOutlined, LogoutOutlined, EditOutlined, HomeOutlined, CodeOutlined, HighlightOutlined } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
 
 const CONTENT_W = 720;
@@ -39,11 +39,15 @@ const NavBar: React.FC = () => {
         {/* left */}
         <Space size="large">
           <Link to="/blogs" style={{ fontSize: 18, fontWeight: 600, color: '#1677ff' }}>
-            📝 Hu Blog
+            📝 kk
           </Link>
           <Link to="/obfuscate" style={{ color: '#333' }}>
             <CodeOutlined style={{ marginRight: 4 }} />
             Obfuscator
+          </Link>
+          <Link to="/prompt-generator" style={{ color: '#333' }}>
+            <HighlightOutlined style={{ marginRight: 4 }} />
+            Prompt
           </Link>
           {isAuthenticated && (
             <>

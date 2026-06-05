@@ -10,6 +10,7 @@ import EditArticlePage from './pages/EditArticlePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CodeObfuscatePage from './pages/CodeObfuscatePage';
+import PromptGeneratorPage from './pages/PromptGeneratorPage';
 import './App.css';
 
 const App = () => (
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/user/login" element={<LoginPage />} />
               <Route path="/user/register" element={<RegisterPage />} />
               <Route path="/obfuscate" element={<CodeObfuscatePage />} />
+              <Route path="/prompt-generator" element={<PromptGeneratorPage />} />
               {/* protected */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<ArticleList />} />
